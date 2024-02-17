@@ -11,6 +11,8 @@ app.use(cors()) // allow cross-origin resource sharing
 // use express's builtin body-parser middleware to parse any data included in a request
 app.use(express.json()) // decode JSON-formatted incoming POST data
 app.use(express.urlencoded({ extended: true })) // decode url-encoded incoming POST data
+app.use(express.static('public'));
+
 
 // connect to database
 mongoose
@@ -21,6 +23,8 @@ mongoose
 // load the dataabase models we want to deal with
 const { Message } = require('./models/Message')
 const { User } = require('./models/User')
+
+
 
 // a route to handle fetching all messages
 app.get('/messages', async (req, res) => {
@@ -39,6 +43,49 @@ app.get('/messages', async (req, res) => {
     })
   }
 })
+
+const AWS = require('aws-sdk');
+
+app.get('/aboutus', async (req, res) => {
+  try {
+    // 存储桶和对象的 URL
+    const objectUrl = 'https://mernapp.s3.us-east-2.amazonaws.com/me.png'; // 替换为实际的存储桶和对象的 URL
+
+    // 发送响应
+    res.json({
+      name: "Silu Xing",
+      bio: "I am a NYU CS junior.",
+      picture: objectUrl
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: err,
+      status: 'failed to retrieve About Us information'
+    });
+  }
+});
+
+
+
+
+// app.get('/aboutus', async (req, res) => {
+//   try{
+//     res.json({
+//       name: "Silu Xing",
+//       bio: "I am a NYU CS junior.",
+//       picture: `${process.env.PUBLIC_URL}/me.png`
+//       // picture: "/asset/me.png"
+      
+//     });
+//   } catch (err) {
+//     console.error(err)
+//     res.status(500).json({
+//       error: err,
+//       status: 'failed to retrieve About Us information'
+//     })
+//   }
+// });
 
 // a route to handle fetching a single message by its id
 app.get('/messages/:messageId', async (req, res) => {
